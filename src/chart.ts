@@ -21,12 +21,12 @@ export class PopulationChart {
 
   render(history: PopulationSnapshot[]) {
     const { ctx, canvas } = this;
-    const w = canvas.width;
-    const h = canvas.height;
+    const w = canvas.getBoundingClientRect().width;
+    const h = canvas.getBoundingClientRect().height;
     const pad = { top: 20, right: 16, bottom: 28, left: 50 };
 
     ctx.fillStyle = CHART_COLORS.bg;
-    ctx.fillRect(0, 0, w, h);
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     if (history.length < 2) {
       ctx.fillStyle = CHART_COLORS.text;

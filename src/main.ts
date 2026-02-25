@@ -159,6 +159,11 @@ app.innerHTML = `
               <input type="range" min="0" max="15" step="1" />
               <span class="param-val"></span>
             </div>
+            <div class="param-row" data-key="initialRoads">
+              <label>Initial roads</label>
+              <input type="range" min="0" max="6" step="1" />
+              <span class="param-val"></span>
+            </div>
           </div>
         </div>
 
@@ -252,8 +257,8 @@ app.innerHTML = `
         </div>
       </div>
 
-      <div class="bottom-row bottom-chart-row">
-        <canvas id="chart" width="960" height="100"></canvas>
+      <div class="bottom-row">
+        <canvas id="chart" height="120"></canvas>
       </div>
     </footer>
   </div>
@@ -269,6 +274,15 @@ const speedVal = document.getElementById('speed-val')!;
 
 let rendererInstance = new Renderer(worldCanvas, sim);
 const chart = new PopulationChart(chartCanvas);
+
+function resizeChart() {
+  const rect = chartCanvas.getBoundingClientRect();
+  chartCanvas.width = Math.round(rect.width * devicePixelRatio);
+  chartCanvas.height = Math.round(rect.height * devicePixelRatio);
+  chartCanvas.getContext('2d')!.scale(devicePixelRatio, devicePixelRatio);
+}
+resizeChart();
+window.addEventListener('resize', resizeChart);
 
 // --- Help Modal ---
 const helpModal = document.getElementById('help-modal')!;
@@ -293,16 +307,30 @@ const btnSettings = document.getElementById('btn-settings') as HTMLButtonElement
 const btnCloseSettings = document.getElementById('btn-close-settings') as HTMLButtonElement;
 const btnResetDefaults = document.getElementById('btn-reset-defaults') as HTMLButtonElement;
 
-btnSettings.addEventListener('click', () => {
-  settingsModal.classList.remove('hidden');
-});
+let pausedBeforeSettings = false;
 
-btnCloseSettings.addEventListener('click', () => {
+function openSettings() {
+  pausedBeforeSettings = paused;
+  paused = true;
+  btnPlay.textContent = 'Play';
+  btnPlay.classList.add('btn-paused');
+  settingsModal.classList.remove('hidden');
+}
+
+function closeSettings() {
   settingsModal.classList.add('hidden');
-});
+  if (!pausedBeforeSettings) {
+    paused = false;
+    btnPlay.textContent = 'Pause';
+    btnPlay.classList.remove('btn-paused');
+  }
+}
+
+btnSettings.addEventListener('click', openSettings);
+btnCloseSettings.addEventListener('click', closeSettings);
 
 settingsModal.addEventListener('click', (e) => {
-  if (e.target === settingsModal) settingsModal.classList.add('hidden');
+  if (e.target === settingsModal) closeSettings();
 });
 
 // Initialize all param sliders from current config

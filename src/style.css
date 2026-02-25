@@ -147,9 +147,11 @@ html, body {
 .bottom-bar {
   display: flex;
   flex-direction: column;
+  align-items: center;
   background: var(--bg-surface);
   border-top: 1px solid var(--border);
   flex-shrink: 0;
+  padding: 10px 20px;
 }
 
 .bottom-row {
@@ -157,11 +159,12 @@ html, body {
   align-items: center;
   justify-content: space-between;
   gap: 24px;
-  padding: 10px 20px;
+  width: 100%;
+  max-width: 960px;
 }
 
 .bottom-row + .bottom-row {
-  padding-top: 0;
+  margin-top: 8px;
 }
 
 .bottom-section {
@@ -183,14 +186,9 @@ html, body {
   gap: 6px;
 }
 
-.bottom-chart-row {
-  padding-top: 0;
-  padding-bottom: 10px;
-}
-
 #chart {
   width: 100%;
-  height: 80px;
+  height: 100px;
   border-radius: 4px;
   border: 1px solid var(--border);
 }
@@ -345,13 +343,6 @@ html, body {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-}
-
-/* ─── Chart ─── */
-#chart {
-  width: 100%;
-  border-radius: 4px;
-  border: 1px solid var(--border);
 }
 
 /* ─── Info ─── */
