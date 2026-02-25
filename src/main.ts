@@ -37,6 +37,14 @@ app.innerHTML = `
     <header class="header">
       <h1 class="logo">Species<span class="logo-accent">Sim</span></h1>
       <div class="header-stats" id="stats"></div>
+      <div class="seed-group">
+        <label class="label seed-label">Seed</label>
+        <input type="text" id="seed-input" class="seed-input" />
+        <button id="btn-load-seed" class="btn btn-sm" title="Load this seed">Go</button>
+        <button id="btn-copy-seed" class="btn btn-sm btn-icon-sm" title="Copy seed">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        </button>
+      </div>
       <div class="header-actions">
         <button id="btn-settings" class="btn btn-icon" title="Settings">&#9881;</button>
         <button id="btn-help" class="btn btn-help">?</button>
@@ -232,10 +240,11 @@ app.innerHTML = `
       <div class="bottom-row">
         <div class="bottom-section">
           <button id="btn-play" class="btn btn-primary">Pause</button>
+          <button id="btn-restart" class="btn" title="Restart with same map">Reset</button>
           <button id="btn-reset" class="btn">Randomize</button>
           <div class="divider"></div>
           <label class="label">Speed</label>
-          <input type="range" id="speed" min="1" max="10" value="1" class="slider" />
+          <input type="range" id="speed" min="0.25" max="10" step="0.25" value="1" class="slider" />
           <span id="speed-val" class="slider-val">1x</span>
         </div>
 
@@ -272,8 +281,40 @@ const btnReset = document.getElementById('btn-reset') as HTMLButtonElement;
 const speedSlider = document.getElementById('speed') as HTMLInputElement;
 const speedVal = document.getElementById('speed-val')!;
 
+const seedInput = document.getElementById('seed-input') as HTMLInputElement;
+const btnLoadSeed = document.getElementById('btn-load-seed') as HTMLButtonElement;
+const btnCopySeed = document.getElementById('btn-copy-seed') as HTMLButtonElement;
+
 let rendererInstance = new Renderer(worldCanvas, sim);
 const chart = new PopulationChart(chartCanvas);
+
+// --- Seed UI ---
+function updateSeedDisplay() {
+  seedInput.value = String(sim.seed);
+}
+updateSeedDisplay();
+
+btnCopySeed.addEventListener('click', () => {
+  navigator.clipboard.writeText(String(sim.seed));
+  btnCopySeed.textContent = 'Copied!';
+  setTimeout(() => { btnCopySeed.textContent = 'Copy'; }, 1200);
+});
+
+btnLoadSeed.addEventListener('click', () => {
+  const seed = parseInt(seedInput.value);
+  if (isNaN(seed)) return;
+  sim = new Simulation(sim.config, seed);
+  rendererInstance = new Renderer(worldCanvas, sim);
+  updateSeedDisplay();
+  syncSettingsUI();
+  paused = true;
+  btnPlay.textContent = 'Play';
+  btnPlay.classList.add('btn-paused');
+});
+
+seedInput.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') btnLoadSeed.click();
+});
 
 function resizeChart() {
   const rect = chartCanvas.getBoundingClientRect();
@@ -382,9 +423,19 @@ btnPlay.addEventListener('click', () => {
   btnPlay.classList.toggle('btn-paused', paused);
 });
 
+const btnRestart = document.getElementById('btn-restart') as HTMLButtonElement;
+
+btnRestart.addEventListener('click', () => {
+  sim.reset();
+  paused = true;
+  btnPlay.textContent = 'Play';
+  btnPlay.classList.add('btn-paused');
+});
+
 btnReset.addEventListener('click', () => {
   sim = new Simulation(sim.config);
   rendererInstance = new Renderer(worldCanvas, sim);
+  updateSeedDisplay();
   syncSettingsUI();
   paused = true;
   btnPlay.textContent = 'Play';
@@ -392,8 +443,8 @@ btnReset.addEventListener('click', () => {
 });
 
 speedSlider.addEventListener('input', () => {
-  speed = parseInt(speedSlider.value);
-  speedVal.textContent = `${speed}x`;
+  speed = parseFloat(speedSlider.value);
+  speedVal.textContent = speed < 1 ? `${speed}x` : `${Math.round(speed)}x`;
 });
 
 // Tool selection
@@ -470,11 +521,13 @@ function loop() {
   frameCount++;
 
   if (!paused) {
-    // At speed 1, tick once every 4 frames (~15 tps at 60fps)
-    // At speed 5, tick every frame
-    // At speed 10, tick 3x per frame
-    const frameSkip = Math.max(1, 5 - speed);
-    const ticksPerFrame = speed > 5 ? speed - 4 : 1;
+    // speed 0.25 = 1 tick every 16 frames
+    // speed 0.5  = 1 tick every 8 frames
+    // speed 1    = 1 tick every 4 frames
+    // speed 5    = 1 tick every frame
+    // speed 10   = 6 ticks per frame
+    const frameSkip = Math.max(1, Math.round(4 / speed));
+    const ticksPerFrame = speed > 4 ? Math.round(speed - 3) : 1;
 
     if (frameCount % frameSkip === 0) {
       for (let i = 0; i < ticksPerFrame; i++) {

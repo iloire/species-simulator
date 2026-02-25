@@ -7,6 +7,7 @@ import type {
   SimConfig,
   PopulationSnapshot,
 } from './types';
+import { SeededRng, randomSeed } from './rng';
 
 export class Simulation {
   config: SimConfig;
@@ -14,12 +15,16 @@ export class Simulation {
   creatures: Creature[];
   tick: number;
   history: PopulationSnapshot[];
+  seed: number;
+  private rng: SeededRng;
   private nextId: number;
   private initialGrid: CellType[][] = [];
   private initialCreatures: Creature[] = [];
 
-  constructor(config: Partial<SimConfig> = {}) {
+  constructor(config: Partial<SimConfig> = {}, seed?: number) {
     this.config = { ...DEFAULT_CONFIG, ...config };
+    this.seed = seed ?? randomSeed();
+    this.rng = new SeededRng(this.seed);
     this.tick = 0;
     this.nextId = 0;
     this.history = [];
@@ -48,7 +53,7 @@ export class Simulation {
     // Initialize grid with empty cells
     this.grid = Array.from({ length: height }, () =>
       Array.from({ length: width }, () =>
-        Math.random() < 0.4 ? CellType.Grass : CellType.Empty
+        this.rng.next() < 0.4 ? CellType.Grass : CellType.Empty
       )
     );
 
@@ -71,15 +76,15 @@ export class Simulation {
 
     for (let r = 0; r < initialRoads; r++) {
       // Pick a random orientation — mostly horizontal or mostly vertical
-      const vertical = Math.random() < 0.5;
+      const vertical = this.rng.next() < 0.5;
 
       // Start from a random edge point
       let x = vertical
-        ? Math.floor(width * 0.2 + Math.random() * width * 0.6)
+        ? Math.floor(width * 0.2 + this.rng.next() * width * 0.6)
         : 0;
       let y = vertical
         ? 0
-        : Math.floor(height * 0.2 + Math.random() * height * 0.6);
+        : Math.floor(height * 0.2 + this.rng.next() * height * 0.6);
 
       // Walk across the map with gentle wandering
       const length = vertical ? height : width;
@@ -101,12 +106,12 @@ export class Simulation {
         }
 
         // Wander in secondary direction
-        if (Math.random() < 0.3) {
+        if (this.rng.next() < 0.3) {
           if (vertical) {
-            x += Math.random() < 0.5 ? 1 : -1;
+            x += this.rng.next() < 0.5 ? 1 : -1;
             x = Math.max(1, Math.min(width - 2, x));
           } else {
-            y += Math.random() < 0.5 ? 1 : -1;
+            y += this.rng.next() < 0.5 ? 1 : -1;
             y = Math.max(1, Math.min(height - 2, y));
           }
         }
@@ -120,8 +125,8 @@ export class Simulation {
     y?: number
   ): Creature | null {
     const cfg = this.config;
-    const cx = x ?? Math.floor(Math.random() * cfg.width);
-    const cy = y ?? Math.floor(Math.random() * cfg.height);
+    const cx = x ?? this.rng.int(0, cfg.width);
+    const cy = y ?? this.rng.int(0, cfg.height);
 
     if (this.grid[cy]?.[cx] === CellType.Road) return null;
 
@@ -138,6 +143,7 @@ export class Simulation {
       vision: isPrey ? cfg.preyVision : cfg.predatorVision,
       fleeTimer: 0,
       huntCooldownTimer: 0,
+      targetId: -1,
     };
 
     this.creatures.push(creature);
@@ -294,13 +300,26 @@ export class Simulation {
       return;
     }
 
-    const nearestPrey = this.findNearest(c, 'prey');
+    // Target lock: try to keep chasing the same prey
+    let target = this.findCreatureById(c.targetId, 'prey');
 
-    if (nearestPrey && !toRemove.has(nearestPrey.id)) {
-      const dist = this.distance(c, nearestPrey);
+    // Drop target if dead, removed, or out of extended vision range
+    if (target && (toRemove.has(target.id) || this.distance(c, target) > c.vision * 2)) {
+      target = null;
+      c.targetId = -1;
+    }
+
+    // Acquire new target if none
+    if (!target) {
+      target = this.findNearest(c, 'prey');
+      c.targetId = target ? target.id : -1;
+    }
+
+    if (target && !toRemove.has(target.id)) {
+      const dist = this.distance(c, target);
 
       // Grass cover: reduce effective vision when prey is on grass
-      const effectiveVision = this.grid[nearestPrey.y]?.[nearestPrey.x] === CellType.Grass
+      const effectiveVision = this.grid[target.y]?.[target.x] === CellType.Grass
         ? c.vision * (1 - this.config.grassCoverVisionReduction)
         : c.vision;
 
@@ -308,22 +327,33 @@ export class Simulation {
         // Attempt catch — not guaranteed
         if (Math.random() < this.config.catchChance) {
           c.energy += this.config.predatorEnergyFromPrey;
-          toRemove.add(nearestPrey.id);
+          toRemove.add(target.id);
           c.huntCooldownTimer = this.config.huntCooldown;
-          this.triggerAlarm(nearestPrey);
+          c.targetId = -1;
+          this.triggerAlarm(target);
         } else {
           // Failed catch — prey escapes, predator loses a tick
           this.moveRandom(c);
         }
       } else if (dist < effectiveVision) {
-        // Chase
-        this.moveToward(c, nearestPrey);
+        // Chase locked target
+        this.moveToward(c, target);
       } else {
+        c.targetId = -1;
         this.moveRandom(c);
       }
     } else {
+      c.targetId = -1;
       this.moveRandom(c);
     }
+  }
+
+  private findCreatureById(id: number, type: 'prey' | 'predator'): Creature | null {
+    if (id < 0) return null;
+    for (const c of this.creatures) {
+      if (c.id === id && c.type === type) return c;
+    }
+    return null;
   }
 
   private triggerAlarm(killed: Creature) {

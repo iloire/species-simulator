@@ -20,6 +20,7 @@ export interface Creature {
   vision: number;
   fleeTimer: number;
   huntCooldownTimer: number;
+  targetId: number;
 }
 
 export interface SimConfig {
@@ -66,7 +67,7 @@ export const DEFAULT_CONFIG: SimConfig = {
   predatorVision: 7,
   roadKillChance: 0.3,
   movementEnergyCost: 0.5,
-  catchChance: 0.5,
+  catchChance: 0.7,
   huntCooldown: 15,
   grassCoverVisionReduction: 0.5,
   predatorMovementEnergyCost: 1.2,
