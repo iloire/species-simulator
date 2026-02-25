@@ -133,6 +133,13 @@ html, body {
   padding: 5px 10px;
 }
 
+.btn-icon-sm {
+  padding: 5px 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .header-actions {
   display: flex;
   gap: 8px;

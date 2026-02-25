@@ -1,6 +1,6 @@
 import { Simulation } from './simulation';
 import { Renderer } from './renderer';
-import { PopulationChart } from './chart';
+
 import { CELL_SIZE, DEFAULT_CONFIG } from './types';
 import type { SimConfig } from './types';
 import './style.css';
@@ -265,16 +265,12 @@ app.innerHTML = `
           </div>
         </div>
       </div>
-
-      <div class="bottom-row">
-        <canvas id="chart" height="120"></canvas>
-      </div>
     </footer>
   </div>
 `;
 
 const worldCanvas = document.getElementById('world') as HTMLCanvasElement;
-const chartCanvas = document.getElementById('chart') as HTMLCanvasElement;
+
 const statsEl = document.getElementById('stats')!;
 const btnPlay = document.getElementById('btn-play') as HTMLButtonElement;
 const btnReset = document.getElementById('btn-reset') as HTMLButtonElement;
@@ -286,7 +282,6 @@ const btnLoadSeed = document.getElementById('btn-load-seed') as HTMLButtonElemen
 const btnCopySeed = document.getElementById('btn-copy-seed') as HTMLButtonElement;
 
 let rendererInstance = new Renderer(worldCanvas, sim);
-const chart = new PopulationChart(chartCanvas);
 
 // --- Seed UI ---
 function updateSeedDisplay() {
@@ -294,10 +289,13 @@ function updateSeedDisplay() {
 }
 updateSeedDisplay();
 
+const copyIcon = btnCopySeed.innerHTML;
+const checkIcon = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+
 btnCopySeed.addEventListener('click', () => {
   navigator.clipboard.writeText(String(sim.seed));
-  btnCopySeed.textContent = 'Copied!';
-  setTimeout(() => { btnCopySeed.textContent = 'Copy'; }, 1200);
+  btnCopySeed.innerHTML = checkIcon;
+  setTimeout(() => { btnCopySeed.innerHTML = copyIcon; }, 1200);
 });
 
 btnLoadSeed.addEventListener('click', () => {
@@ -316,14 +314,7 @@ seedInput.addEventListener('keydown', (e) => {
   if (e.key === 'Enter') btnLoadSeed.click();
 });
 
-function resizeChart() {
-  const rect = chartCanvas.getBoundingClientRect();
-  chartCanvas.width = Math.round(rect.width * devicePixelRatio);
-  chartCanvas.height = Math.round(rect.height * devicePixelRatio);
-  chartCanvas.getContext('2d')!.scale(devicePixelRatio, devicePixelRatio);
-}
-resizeChart();
-window.addEventListener('resize', resizeChart);
+
 
 // --- Help Modal ---
 const helpModal = document.getElementById('help-modal')!;
@@ -537,7 +528,7 @@ function loop() {
   }
 
   rendererInstance.render();
-  chart.render(sim.history);
+
   updateStats();
 
   requestAnimationFrame(loop);
