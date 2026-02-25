@@ -45,6 +45,7 @@ export interface SimConfig {
   grassCoverVisionReduction: number;
   predatorMovementEnergyCost: number;
   preyAlarmRadius: number;
+  initialRoads: number;
 }
 
 export const DEFAULT_CONFIG: SimConfig = {
@@ -56,7 +57,7 @@ export const DEFAULT_CONFIG: SimConfig = {
   preyEnergyFromGrass: 12,
   predatorEnergyFromPrey: 40,
   preyReproductionThreshold: 100,
-  predatorReproductionThreshold: 140,
+  predatorReproductionThreshold: 120,
   preyMaxAge: 300,
   predatorMaxAge: 500,
   preySpeed: 1,
@@ -70,6 +71,7 @@ export const DEFAULT_CONFIG: SimConfig = {
   grassCoverVisionReduction: 0.5,
   predatorMovementEnergyCost: 1.2,
   preyAlarmRadius: 6,
+  initialRoads: 2,
 };
 
 export interface PopulationSnapshot {

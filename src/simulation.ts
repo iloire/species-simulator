@@ -15,6 +15,8 @@ export class Simulation {
   tick: number;
   history: PopulationSnapshot[];
   private nextId: number;
+  private initialGrid: CellType[][] = [];
+  private initialCreatures: Creature[] = [];
 
   constructor(config: Partial<SimConfig> = {}) {
     this.config = { ...DEFAULT_CONFIG, ...config };
@@ -24,6 +26,20 @@ export class Simulation {
     this.grid = [];
     this.creatures = [];
     this.init();
+    this.saveSnapshot();
+  }
+
+  private saveSnapshot() {
+    this.initialGrid = this.grid.map((row) => [...row]);
+    this.initialCreatures = this.creatures.map((c) => ({ ...c }));
+  }
+
+  reset() {
+    this.tick = 0;
+    this.nextId = this.initialCreatures.length;
+    this.history = [];
+    this.grid = this.initialGrid.map((row) => [...row]);
+    this.creatures = this.initialCreatures.map((c) => ({ ...c }));
   }
 
   private init() {
@@ -36,6 +52,9 @@ export class Simulation {
       )
     );
 
+    // Generate random roads that cross the map
+    this.generateRoads();
+
     // Spawn prey
     for (let i = 0; i < this.config.initialPrey; i++) {
       this.spawnCreature('prey');
@@ -44,6 +63,54 @@ export class Simulation {
     // Spawn predators
     for (let i = 0; i < this.config.initialPredators; i++) {
       this.spawnCreature('predator');
+    }
+  }
+
+  private generateRoads() {
+    const { width, height, initialRoads } = this.config;
+
+    for (let r = 0; r < initialRoads; r++) {
+      // Pick a random orientation — mostly horizontal or mostly vertical
+      const vertical = Math.random() < 0.5;
+
+      // Start from a random edge point
+      let x = vertical
+        ? Math.floor(width * 0.2 + Math.random() * width * 0.6)
+        : 0;
+      let y = vertical
+        ? 0
+        : Math.floor(height * 0.2 + Math.random() * height * 0.6);
+
+      // Walk across the map with gentle wandering
+      const length = vertical ? height : width;
+      for (let step = 0; step < length; step++) {
+        // Place road with 3-cell width for visibility
+        for (let t = -1; t <= 1; t++) {
+          const px = vertical ? x + t : x;
+          const py = vertical ? y : y + t;
+          if (px >= 0 && px < width && py >= 0 && py < height) {
+            this.grid[py][px] = CellType.Road;
+          }
+        }
+
+        // Advance in primary direction
+        if (vertical) {
+          y++;
+        } else {
+          x++;
+        }
+
+        // Wander in secondary direction
+        if (Math.random() < 0.3) {
+          if (vertical) {
+            x += Math.random() < 0.5 ? 1 : -1;
+            x = Math.max(1, Math.min(width - 2, x));
+          } else {
+            y += Math.random() < 0.5 ? 1 : -1;
+            y = Math.max(1, Math.min(height - 2, y));
+          }
+        }
+      }
     }
   }
 
