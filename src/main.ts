@@ -436,7 +436,7 @@ btnRestart.addEventListener('click', () => {
 });
 
 btnReset.addEventListener('click', () => {
-  sim = new Simulation(orientedConfig(sim.config));
+  sim = new Simulation(sim.config);
   rendererInstance = new Renderer(worldCanvas, sim);
   updateSeedDisplay();
   syncSettingsUI();
