@@ -4,6 +4,7 @@ A real-time ecosystem simulator that visualizes predator-prey dynamics on a grid
 
 Built with TypeScript and HTML5 Canvas. No frameworks, no dependencies.
 
+[![Live Demo](https://img.shields.io/badge/demo-live-brightgreen)](https://iloire.github.io/species-simulator/)
 ![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178c6)
 ![Vite](https://img.shields.io/badge/Vite-7.3-646cff)
 
