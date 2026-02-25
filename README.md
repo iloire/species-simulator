@@ -10,6 +10,10 @@ Built with TypeScript and HTML5 Canvas. No frameworks, no dependencies.
 
 ![SpeciesSim screenshot](screenshots/v1.png)
 
+### GA Evolution
+
+![GA Evolution screenshot](screenshots/ga-v1.png)
+
 ## How It Works
 
 **Prey** (yellow) eat grass to gain energy, flee from nearby predators, and reproduce when they have enough energy. **Predators** (red) hunt prey, move faster, but starve quickly without food. Populations self-regulate through classic Lotka-Volterra dynamics — predator booms follow prey booms, then crash when food runs out.
