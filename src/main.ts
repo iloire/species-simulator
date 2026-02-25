@@ -7,7 +7,8 @@ import './style.css';
 // --- State ---
 let sim = new Simulation();
 let paused = false;
-let speed = 1;
+let speed = 1; // 1 = every 4th frame, 10 = every frame * multiple ticks
+let frameCount = 0;
 let tool: 'road' | 'erase' | 'prey' | 'predator' = 'road';
 let isDrawing = false;
 
@@ -25,55 +26,50 @@ app.innerHTML = `
       <div class="canvas-wrap">
         <canvas id="world"></canvas>
       </div>
-
-      <aside class="sidebar">
-        <section class="panel">
-          <h2 class="panel-title">Controls</h2>
-          <div class="controls-row">
-            <button id="btn-play" class="btn btn-primary">Pause</button>
-            <button id="btn-reset" class="btn">Reset</button>
-          </div>
-          <div class="control-group">
-            <label class="label">Speed</label>
-            <input type="range" id="speed" min="1" max="10" value="1" class="slider" />
-            <span id="speed-val" class="slider-val">1x</span>
-          </div>
-        </section>
-
-        <section class="panel">
-          <h2 class="panel-title">Tools</h2>
-          <div class="tool-grid">
-            <button class="btn tool-btn active" data-tool="road">
-              <span class="tool-icon road-icon"></span>Road
-            </button>
-            <button class="btn tool-btn" data-tool="erase">
-              <span class="tool-icon erase-icon"></span>Erase
-            </button>
-            <button class="btn tool-btn" data-tool="prey">
-              <span class="tool-icon prey-dot"></span>+ Prey
-            </button>
-            <button class="btn tool-btn" data-tool="predator">
-              <span class="tool-icon pred-dot"></span>+ Predator
-            </button>
-          </div>
-        </section>
-
-        <section class="panel">
-          <h2 class="panel-title">Population</h2>
-          <canvas id="chart" width="320" height="180"></canvas>
-        </section>
-
-        <section class="panel hint-panel">
-          <h2 class="panel-title">How It Works</h2>
-          <p class="info-text">
-            <strong class="prey-color">Prey</strong> eat grass, flee from predators, and reproduce when well-fed.
-            <strong class="pred-color">Predators</strong> hunt prey and starve without food.
-            <strong class="road-color">Roads</strong> fragment habitat and kill creatures crossing them.
-          </p>
-          <p class="info-text muted">Click and drag on the world to use tools.</p>
-        </section>
-      </aside>
     </main>
+
+    <footer class="bottom-bar">
+      <div class="bottom-section">
+        <div class="controls-row">
+          <button id="btn-play" class="btn btn-primary">Pause</button>
+          <button id="btn-reset" class="btn">Reset</button>
+        </div>
+        <div class="control-group">
+          <label class="label">Speed</label>
+          <input type="range" id="speed" min="1" max="10" value="1" class="slider" />
+          <span id="speed-val" class="slider-val">1x</span>
+        </div>
+      </div>
+
+      <div class="bottom-section">
+        <div class="tool-grid">
+          <button class="btn tool-btn active" data-tool="road">
+            <span class="tool-icon road-icon"></span>Road
+          </button>
+          <button class="btn tool-btn" data-tool="erase">
+            <span class="tool-icon erase-icon"></span>Erase
+          </button>
+          <button class="btn tool-btn" data-tool="prey">
+            <span class="tool-icon prey-dot"></span>+ Prey
+          </button>
+          <button class="btn tool-btn" data-tool="predator">
+            <span class="tool-icon pred-dot"></span>+ Predator
+          </button>
+        </div>
+      </div>
+
+      <div class="bottom-section bottom-chart">
+        <canvas id="chart" width="480" height="120"></canvas>
+      </div>
+
+      <div class="bottom-section bottom-info">
+        <p class="info-text">
+          <strong class="prey-color">Prey</strong> eat grass &middot;
+          <strong class="pred-color">Predators</strong> hunt prey &middot;
+          <strong class="road-color">Roads</strong> fragment habitat
+        </p>
+      </div>
+    </footer>
   </div>
 `;
 
@@ -98,9 +94,9 @@ btnPlay.addEventListener('click', () => {
 btnReset.addEventListener('click', () => {
   sim = new Simulation();
   rendererInstance = new Renderer(worldCanvas, sim);
-  paused = false;
-  btnPlay.textContent = 'Pause';
-  btnPlay.classList.remove('btn-paused');
+  paused = true;
+  btnPlay.textContent = 'Play';
+  btnPlay.classList.add('btn-paused');
 });
 
 speedSlider.addEventListener('input', () => {
@@ -178,9 +174,19 @@ function updateStats() {
 }
 
 function loop() {
+  frameCount++;
+
   if (!paused) {
-    for (let i = 0; i < speed; i++) {
-      sim.step();
+    // At speed 1, tick once every 4 frames (~15 tps at 60fps)
+    // At speed 5, tick every frame
+    // At speed 10, tick 3x per frame
+    const frameSkip = Math.max(1, 5 - speed);
+    const ticksPerFrame = speed > 5 ? speed - 4 : 1;
+
+    if (frameCount % frameSkip === 0) {
+      for (let i = 0; i < ticksPerFrame; i++) {
+        sim.step();
+      }
     }
   }
 
