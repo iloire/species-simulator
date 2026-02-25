@@ -20,8 +20,9 @@ export class Simulation {
   private nextId: number;
   private initialGrid: CellType[][] = [];
   private initialCreatures: Creature[] = [];
+  private headless: boolean;
 
-  constructor(config: Partial<SimConfig> = {}, seed?: number) {
+  constructor(config: Partial<SimConfig> = {}, seed?: number, headless = false) {
     this.config = { ...DEFAULT_CONFIG, ...config };
     this.seed = seed ?? randomSeed();
     this.rng = new SeededRng(this.seed);
@@ -30,8 +31,9 @@ export class Simulation {
     this.history = [];
     this.grid = [];
     this.creatures = [];
+    this.headless = headless;
     this.init();
-    this.saveSnapshot();
+    if (!headless) this.saveSnapshot();
   }
 
   private saveSnapshot() {
@@ -172,7 +174,7 @@ export class Simulation {
     this.tick++;
     this.growGrass();
     this.updateCreatures();
-    this.recordHistory();
+    if (!this.headless) this.recordHistory();
   }
 
   private growGrass() {
