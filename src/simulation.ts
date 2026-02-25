@@ -309,6 +309,19 @@ export class Simulation {
       c.targetId = -1;
     }
 
+    // Re-evaluate: switch to a much closer prey if available
+    if (target) {
+      const nearest = this.findNearest(c, 'prey');
+      if (nearest && nearest.id !== target.id) {
+        const currentDist = this.distance(c, target);
+        const nearestDist = this.distance(c, nearest);
+        if (nearestDist < currentDist * 0.5) {
+          target = nearest;
+          c.targetId = nearest.id;
+        }
+      }
+    }
+
     // Acquire new target if none
     if (!target) {
       target = this.findNearest(c, 'prey');
