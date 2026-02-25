@@ -134,6 +134,21 @@ app.innerHTML = `
               <input type="range" min="0.1" max="2" step="0.1" />
               <span class="param-val"></span>
             </div>
+            <div class="param-row" data-key="catchChance">
+              <label>Catch chance</label>
+              <input type="range" min="0.1" max="1" step="0.05" />
+              <span class="param-val"></span>
+            </div>
+            <div class="param-row" data-key="huntCooldown">
+              <label>Hunt cooldown (ticks)</label>
+              <input type="range" min="0" max="40" step="1" />
+              <span class="param-val"></span>
+            </div>
+            <div class="param-row" data-key="grassCoverVisionReduction">
+              <label>Grass cover (vision reduction)</label>
+              <input type="range" min="0" max="0.9" step="0.05" />
+              <span class="param-val"></span>
+            </div>
           </div>
         </div>
 

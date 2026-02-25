@@ -70,6 +70,7 @@ export class Simulation {
       speed: isPrey ? cfg.preySpeed : cfg.predatorSpeed,
       vision: isPrey ? cfg.preyVision : cfg.predatorVision,
       fleeTimer: 0,
+      huntCooldownTimer: 0,
     };
 
     this.creatures.push(creature);
@@ -217,16 +218,34 @@ export class Simulation {
     _allCreatures: Creature[],
     toRemove: Set<number>
   ) {
+    // Cooldown after eating
+    if (c.huntCooldownTimer > 0) {
+      c.huntCooldownTimer--;
+      this.moveRandom(c);
+      return;
+    }
+
     const nearestPrey = this.findNearest(c, 'prey');
 
     if (nearestPrey && !toRemove.has(nearestPrey.id)) {
       const dist = this.distance(c, nearestPrey);
 
+      // Grass cover: reduce effective vision when prey is on grass
+      const effectiveVision = this.grid[nearestPrey.y]?.[nearestPrey.x] === CellType.Grass
+        ? c.vision * (1 - this.config.grassCoverVisionReduction)
+        : c.vision;
+
       if (dist < 1.5) {
-        // Catch and eat
-        c.energy += this.config.predatorEnergyFromPrey;
-        toRemove.add(nearestPrey.id);
-      } else if (dist < c.vision) {
+        // Attempt catch — not guaranteed
+        if (Math.random() < this.config.catchChance) {
+          c.energy += this.config.predatorEnergyFromPrey;
+          toRemove.add(nearestPrey.id);
+          c.huntCooldownTimer = this.config.huntCooldown;
+        } else {
+          // Failed catch — prey escapes, predator loses a tick
+          this.moveRandom(c);
+        }
+      } else if (dist < effectiveVision) {
         // Chase
         this.moveToward(c, nearestPrey);
       } else {
