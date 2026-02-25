@@ -461,12 +461,12 @@ document.querySelectorAll('.tool-btn').forEach((btn) => {
 });
 
 // Canvas interaction
-function canvasToGrid(e: MouseEvent): [number, number] {
+function canvasToGrid(clientX: number, clientY: number): [number, number] {
   const rect = worldCanvas.getBoundingClientRect();
   const scaleX = worldCanvas.width / rect.width;
   const scaleY = worldCanvas.height / rect.height;
-  const x = Math.floor(((e.clientX - rect.left) * scaleX) / CELL_SIZE);
-  const y = Math.floor(((e.clientY - rect.top) * scaleY) / CELL_SIZE);
+  const x = Math.floor(((clientX - rect.left) * scaleX) / CELL_SIZE);
+  const y = Math.floor(((clientY - rect.top) * scaleY) / CELL_SIZE);
   return [x, y];
 }
 
@@ -497,17 +497,38 @@ function applyTool(x: number, y: number) {
 
 worldCanvas.addEventListener('mousedown', (e) => {
   isDrawing = true;
-  const [x, y] = canvasToGrid(e);
+  const [x, y] = canvasToGrid(e.clientX, e.clientY);
   applyTool(x, y);
 });
 
 worldCanvas.addEventListener('mousemove', (e) => {
   if (!isDrawing) return;
-  const [x, y] = canvasToGrid(e);
+  const [x, y] = canvasToGrid(e.clientX, e.clientY);
   applyTool(x, y);
 });
 
 window.addEventListener('mouseup', () => {
+  isDrawing = false;
+});
+
+// Touch support for mobile
+worldCanvas.addEventListener('touchstart', (e) => {
+  e.preventDefault();
+  isDrawing = true;
+  const touch = e.touches[0];
+  const [x, y] = canvasToGrid(touch.clientX, touch.clientY);
+  applyTool(x, y);
+}, { passive: false });
+
+worldCanvas.addEventListener('touchmove', (e) => {
+  e.preventDefault();
+  if (!isDrawing) return;
+  const touch = e.touches[0];
+  const [x, y] = canvasToGrid(touch.clientX, touch.clientY);
+  applyTool(x, y);
+}, { passive: false });
+
+window.addEventListener('touchend', () => {
   isDrawing = false;
 });
 
