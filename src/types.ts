@@ -57,13 +57,13 @@ export const DEFAULT_CONFIG: SimConfig = {
   initialPredators: 25, // Predators spawned at simulation start
   preyEnergyFromGrass: 10, // Energy prey gains from eating one grass tile
   predatorEnergyFromPrey: 40, // Energy predator gains from catching one prey
-  preyReproductionThreshold: 100, // Energy above which prey reproduce (halved after)
-  predatorReproductionThreshold: 120, // Energy above which predators reproduce (halved after)
-  preyMaxAge: 300, // Ticks before prey dies of old age
-  predatorMaxAge: 500, // Ticks before predator dies of old age
-  preySpeed: 1, // Cells per tick; fractional part = chance of an extra step
-  predatorSpeed: 1.3, // Cells per tick; fractional part = chance of an extra step
-  preyVision: 5, // Detection range in cells (predators + grass)
+  preyReproductionThreshold: 80, // Energy above which prey reproduce (halved after)
+  predatorReproductionThreshold: 130, // Energy above which predators reproduce (halved after)
+  preyMaxAge: 550, // Ticks before prey dies of old age
+  predatorMaxAge: 800, // Ticks before predator dies of old age
+  preySpeed: 1.1, // Cells per tick; fractional part = chance of an extra step
+  predatorSpeed: 1.6, // Cells per tick; fractional part = chance of an extra step
+  preyVision: 6, // Detection range in cells (predators + grass)
   predatorVision: 8, // Detection range in cells (prey)
   roadKillChance: 0.3, // Chance per tick a creature on a road tile dies
   movementEnergyCost: 0.5, // Energy prey spends per tick moving
