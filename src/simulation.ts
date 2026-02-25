@@ -263,13 +263,26 @@ export class Simulation {
   private moveToward(c: Creature, target: { x: number; y: number }) {
     const dx = Math.sign(target.x - c.x);
     const dy = Math.sign(target.y - c.y);
-    this.tryMove(c, dx, dy);
+    const steps = this.getSteps(c);
+    for (let i = 0; i < steps; i++) {
+      this.tryMove(c, dx, dy);
+    }
   }
 
   private moveAway(c: Creature, threat: { x: number; y: number }) {
     const dx = Math.sign(c.x - threat.x);
     const dy = Math.sign(c.y - threat.y);
-    this.tryMove(c, dx, dy);
+    const steps = this.getSteps(c);
+    for (let i = 0; i < steps; i++) {
+      this.tryMove(c, dx, dy);
+    }
+  }
+
+  // Speed 1.0 = always 1 step. Speed 1.3 = 1 step + 30% chance of a 2nd step.
+  private getSteps(c: Creature): number {
+    const base = Math.floor(c.speed);
+    const frac = c.speed - base;
+    return base + (Math.random() < frac ? 1 : 0);
   }
 
   private moveTowardGrass(c: Creature) {
@@ -308,9 +321,12 @@ export class Simulation {
   }
 
   private moveRandom(c: Creature) {
-    const dx = Math.floor(Math.random() * 3) - 1;
-    const dy = Math.floor(Math.random() * 3) - 1;
-    this.tryMove(c, dx, dy);
+    const steps = this.getSteps(c);
+    for (let i = 0; i < steps; i++) {
+      const dx = Math.floor(Math.random() * 3) - 1;
+      const dy = Math.floor(Math.random() * 3) - 1;
+      this.tryMove(c, dx, dy);
+    }
   }
 
   private tryMove(c: Creature, dx: number, dy: number) {
