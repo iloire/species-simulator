@@ -43,6 +43,8 @@ export interface SimConfig {
   catchChance: number;
   huntCooldown: number;
   grassCoverVisionReduction: number;
+  predatorMovementEnergyCost: number;
+  preyAlarmRadius: number;
 }
 
 export const DEFAULT_CONFIG: SimConfig = {
@@ -58,7 +60,7 @@ export const DEFAULT_CONFIG: SimConfig = {
   preyMaxAge: 300,
   predatorMaxAge: 500,
   preySpeed: 1,
-  predatorSpeed: 1.1,
+  predatorSpeed: 1.3,
   preyVision: 5,
   predatorVision: 7,
   roadKillChance: 0.3,
@@ -66,6 +68,8 @@ export const DEFAULT_CONFIG: SimConfig = {
   catchChance: 0.5,
   huntCooldown: 15,
   grassCoverVisionReduction: 0.5,
+  predatorMovementEnergyCost: 1.2,
+  preyAlarmRadius: 6,
 };
 
 export interface PopulationSnapshot {

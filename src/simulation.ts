@@ -146,7 +146,9 @@ export class Simulation {
       if (toRemove.has(c.id)) continue;
 
       c.age++;
-      c.energy -= this.config.movementEnergyCost;
+      c.energy -= c.type === 'predator'
+        ? this.config.predatorMovementEnergyCost
+        : this.config.movementEnergyCost;
 
       // Death by age or starvation
       if (c.energy <= 0 || c.age >= c.maxAge) {
@@ -241,6 +243,7 @@ export class Simulation {
           c.energy += this.config.predatorEnergyFromPrey;
           toRemove.add(nearestPrey.id);
           c.huntCooldownTimer = this.config.huntCooldown;
+          this.triggerAlarm(nearestPrey);
         } else {
           // Failed catch — prey escapes, predator loses a tick
           this.moveRandom(c);
@@ -253,6 +256,16 @@ export class Simulation {
       }
     } else {
       this.moveRandom(c);
+    }
+  }
+
+  private triggerAlarm(killed: Creature) {
+    const radius = this.config.preyAlarmRadius;
+    for (const c of this.creatures) {
+      if (c.type !== 'prey' || c.id === killed.id) continue;
+      if (this.distance(c, killed) <= radius) {
+        c.fleeTimer = Math.max(c.fleeTimer, 8);
+      }
     }
   }
 

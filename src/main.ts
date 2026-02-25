@@ -149,6 +149,16 @@ app.innerHTML = `
               <input type="range" min="0" max="0.9" step="0.05" />
               <span class="param-val"></span>
             </div>
+            <div class="param-row" data-key="predatorMovementEnergyCost">
+              <label>Predator energy drain</label>
+              <input type="range" min="0.1" max="3" step="0.1" />
+              <span class="param-val"></span>
+            </div>
+            <div class="param-row" data-key="preyAlarmRadius">
+              <label>Prey alarm radius</label>
+              <input type="range" min="0" max="15" step="1" />
+              <span class="param-val"></span>
+            </div>
           </div>
         </div>
 
