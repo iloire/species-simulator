@@ -414,8 +414,11 @@ settingsModal.querySelectorAll<HTMLDivElement>('.param-row').forEach((row) => {
 });
 
 btnResetDefaults.addEventListener('click', () => {
-  Object.assign(sim.config, { ...DEFAULT_CONFIG, ...orientedConfig() });
+  const defaults = { ...DEFAULT_CONFIG, ...orientedConfig() };
+  sim = new Simulation(defaults);
+  rendererInstance = new Renderer(worldCanvas, sim);
   saveConfig(sim.config);
+  updateSeedDisplay();
   syncSettingsUI();
 });
 

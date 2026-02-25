@@ -55,7 +55,7 @@ export const DEFAULT_CONFIG: SimConfig = {
   grassGrowthRate: 0.015,
   initialPrey: 120,
   initialPredators: 25,
-  preyEnergyFromGrass: 12,
+  preyEnergyFromGrass: 10,
   predatorEnergyFromPrey: 40,
   preyReproductionThreshold: 100,
   predatorReproductionThreshold: 120,
