@@ -64,11 +64,11 @@ export const DEFAULT_CONFIG: SimConfig = {
   preySpeed: 1, // Cells per tick; fractional part = chance of an extra step
   predatorSpeed: 1.3, // Cells per tick; fractional part = chance of an extra step
   preyVision: 5, // Detection range in cells (predators + grass)
-  predatorVision: 7, // Detection range in cells (prey)
+  predatorVision: 8, // Detection range in cells (prey)
   roadKillChance: 0.3, // Chance per tick a creature on a road tile dies
   movementEnergyCost: 0.5, // Energy prey spends per tick moving
-  catchChance: 0.7, // Probability an adjacent predator catches its prey
-  huntCooldown: 15, // Ticks a predator idles after a successful kill
+  catchChance: 0.8, // Probability an adjacent predator catches its prey
+  huntCooldown: 10, // Ticks a predator idles after a successful kill
   grassCoverVisionReduction: 0.5, // Fraction of predator vision lost when prey hides on grass
   predatorMovementEnergyCost: 1.2, // Energy predator spends per tick moving
   preyAlarmRadius: 6, // Radius in cells where nearby prey flee after a kill
