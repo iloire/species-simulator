@@ -336,6 +336,10 @@ html, body {
   gap: 6px;
 }
 
+.tool-btn[data-tool="erase"] {
+  margin-left: 8px;
+}
+
 .tool-btn {
   display: flex;
   align-items: center;
@@ -371,10 +375,9 @@ html, body {
   background: var(--accent);
 }
 
-.erase-icon::before {
-  content: '×';
-  font-size: 1.1rem;
-  line-height: 1;
+svg.erase-icon {
+  width: 16px;
+  height: 16px;
 }
 
 .tool-icon.prey-dot,

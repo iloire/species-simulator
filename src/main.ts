@@ -265,7 +265,7 @@ app.innerHTML = `
               <span class="tool-icon road-icon"></span>Road
             </button>
             <button class="btn tool-btn" data-tool="erase">
-              <span class="tool-icon erase-icon"></span>Erase
+              <svg class="tool-icon erase-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 20H7L3 16c-.8-.8-.8-2 0-2.8L14.6 1.6c.8-.8 2-.8 2.8 0L21 5.2c.8.8.8 2 0 2.8L11 18"/><path d="M6 12l5.4 5.4"/></svg>
             </button>
             <button class="btn tool-btn" data-tool="prey">
               <span class="tool-icon prey-dot"></span>+ Prey
