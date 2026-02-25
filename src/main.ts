@@ -224,45 +224,36 @@ app.innerHTML = `
     </main>
 
     <footer class="bottom-bar">
-      <div class="bottom-section">
-        <div class="controls-row">
+      <div class="bottom-row">
+        <div class="bottom-section">
           <button id="btn-play" class="btn btn-primary">Pause</button>
           <button id="btn-reset" class="btn">Randomize</button>
-        </div>
-        <div class="control-group">
+          <div class="divider"></div>
           <label class="label">Speed</label>
           <input type="range" id="speed" min="1" max="10" value="1" class="slider" />
           <span id="speed-val" class="slider-val">1x</span>
         </div>
-      </div>
 
-      <div class="bottom-section">
-        <div class="tool-grid">
-          <button class="btn tool-btn active" data-tool="road">
-            <span class="tool-icon road-icon"></span>Road
-          </button>
-          <button class="btn tool-btn" data-tool="erase">
-            <span class="tool-icon erase-icon"></span>Erase
-          </button>
-          <button class="btn tool-btn" data-tool="prey">
-            <span class="tool-icon prey-dot"></span>+ Prey
-          </button>
-          <button class="btn tool-btn" data-tool="predator">
-            <span class="tool-icon pred-dot"></span>+ Predator
-          </button>
+        <div class="bottom-section">
+          <div class="tool-row">
+            <button class="btn tool-btn active" data-tool="road">
+              <span class="tool-icon road-icon"></span>Road
+            </button>
+            <button class="btn tool-btn" data-tool="erase">
+              <span class="tool-icon erase-icon"></span>Erase
+            </button>
+            <button class="btn tool-btn" data-tool="prey">
+              <span class="tool-icon prey-dot"></span>+ Prey
+            </button>
+            <button class="btn tool-btn" data-tool="predator">
+              <span class="tool-icon pred-dot"></span>+ Predator
+            </button>
+          </div>
         </div>
       </div>
 
-      <div class="bottom-section bottom-chart">
-        <canvas id="chart" width="480" height="120"></canvas>
-      </div>
-
-      <div class="bottom-section bottom-info">
-        <p class="info-text">
-          <strong class="prey-color">Prey</strong> eat grass &middot;
-          <strong class="pred-color">Predators</strong> hunt prey &middot;
-          <strong class="road-color">Roads</strong> fragment habitat
-        </p>
+      <div class="bottom-row bottom-chart-row">
+        <canvas id="chart" width="960" height="100"></canvas>
       </div>
     </footer>
   </div>
@@ -412,7 +403,8 @@ function applyTool(x: number, y: number) {
   }
 
   if (tool === 'prey' || tool === 'predator') {
-    for (let i = 0; i < 3; i++) {
+    const count = tool === 'predator' ? 1 : 3;
+    for (let i = 0; i < count; i++) {
       const ox = x + Math.floor(Math.random() * 5) - 2;
       const oy = y + Math.floor(Math.random() * 5) - 2;
       sim['spawnCreature'](tool, ox, oy);

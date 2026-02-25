@@ -146,40 +146,53 @@ html, body {
 /* ─── Bottom Bar ─── */
 .bottom-bar {
   display: flex;
-  align-items: center;
-  gap: 20px;
-  padding: 12px 20px;
+  flex-direction: column;
   background: var(--bg-surface);
   border-top: 1px solid var(--border);
   flex-shrink: 0;
-  overflow-x: auto;
+}
+
+.bottom-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 10px 20px;
+}
+
+.bottom-row + .bottom-row {
+  padding-top: 0;
 }
 
 .bottom-section {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   flex-shrink: 0;
 }
 
-.bottom-section .controls-row {
-  margin-bottom: 0;
+.divider {
+  width: 1px;
+  height: 20px;
+  background: var(--border);
+  margin: 0 4px;
 }
 
-.bottom-chart {
-  flex: 1;
-  min-width: 200px;
+.tool-row {
+  display: flex;
+  gap: 6px;
+}
+
+.bottom-chart-row {
+  padding-top: 0;
+  padding-bottom: 10px;
 }
 
 #chart {
   width: 100%;
-  height: 100px;
+  height: 80px;
   border-radius: 4px;
   border: 1px solid var(--border);
-}
-
-.bottom-info {
-  flex-shrink: 0;
 }
 
 .panel-title {
@@ -233,22 +246,7 @@ html, body {
   border-color: #4a9a42;
 }
 
-.controls-row {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 14px;
-}
-
-.controls-row .btn {
-  flex: 1;
-}
-
 /* ─── Slider ─── */
-.control-group {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
 
 .label {
   font-size: 0.8rem;
@@ -257,7 +255,7 @@ html, body {
 }
 
 .slider {
-  flex: 1;
+  width: 100px;
   -webkit-appearance: none;
   appearance: none;
   height: 4px;
