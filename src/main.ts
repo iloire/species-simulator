@@ -250,7 +250,7 @@ app.innerHTML = `
     <footer class="bottom-bar">
       <div class="bottom-row">
         <div class="bottom-section">
-          <button id="btn-play" class="btn btn-primary">Pause</button>
+          <button id="btn-play" class="btn btn-primary" title="Pause"></button>
           <button id="btn-restart" class="btn" title="Restart with same map">Reset</button>
           <button id="btn-reset" class="btn">Randomize</button>
           <div class="divider"></div>
@@ -263,9 +263,6 @@ app.innerHTML = `
           <div class="tool-row">
             <button class="btn tool-btn active" data-tool="road">
               <span class="tool-icon road-icon"></span>Road
-            </button>
-            <button class="btn tool-btn" data-tool="erase">
-              <svg class="tool-icon erase-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 20H7L3 16c-.8-.8-.8-2 0-2.8L14.6 1.6c.8-.8 2-.8 2.8 0L21 5.2c.8.8.8 2 0 2.8L11 18"/><path d="M6 12l5.4 5.4"/></svg>
             </button>
             <button class="btn tool-btn" data-tool="prey">
               <span class="tool-icon prey-dot"></span>+ Prey
@@ -284,6 +281,8 @@ const worldCanvas = document.getElementById('world') as HTMLCanvasElement;
 
 const statsEl = document.getElementById('stats')!;
 const btnPlay = document.getElementById('btn-play') as HTMLButtonElement;
+const ICON_PAUSE = '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg>';
+const ICON_PLAY = '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="6,4 20,12 6,20"/></svg>';
 const btnReset = document.getElementById('btn-reset') as HTMLButtonElement;
 const speedSlider = document.getElementById('speed') as HTMLInputElement;
 const speedVal = document.getElementById('speed-val')!;
@@ -291,6 +290,8 @@ const speedVal = document.getElementById('speed-val')!;
 const seedInput = document.getElementById('seed-input') as HTMLInputElement;
 const btnLoadSeed = document.getElementById('btn-load-seed') as HTMLButtonElement;
 const btnCopySeed = document.getElementById('btn-copy-seed') as HTMLButtonElement;
+
+btnPlay.innerHTML = ICON_PAUSE;
 
 let rendererInstance = new Renderer(worldCanvas, sim);
 
@@ -317,7 +318,7 @@ btnLoadSeed.addEventListener('click', () => {
   updateSeedDisplay();
   syncSettingsUI();
   paused = true;
-  btnPlay.textContent = 'Play';
+  btnPlay.innerHTML = ICON_PLAY;
   btnPlay.classList.add('btn-paused');
 });
 
@@ -355,7 +356,7 @@ let pausedBeforeSettings = false;
 function openSettings() {
   pausedBeforeSettings = paused;
   paused = true;
-  btnPlay.textContent = 'Play';
+  btnPlay.innerHTML = ICON_PLAY;
   btnPlay.classList.add('btn-paused');
   settingsModal.classList.remove('hidden');
 }
@@ -364,7 +365,7 @@ function closeSettings() {
   settingsModal.classList.add('hidden');
   if (!pausedBeforeSettings) {
     paused = false;
-    btnPlay.textContent = 'Pause';
+    btnPlay.innerHTML = ICON_PAUSE;
     btnPlay.classList.remove('btn-paused');
   }
 }
@@ -421,7 +422,7 @@ syncSettingsUI();
 // --- Controls ---
 btnPlay.addEventListener('click', () => {
   paused = !paused;
-  btnPlay.textContent = paused ? 'Play' : 'Pause';
+  btnPlay.innerHTML = paused ? ICON_PLAY : ICON_PAUSE;
   btnPlay.classList.toggle('btn-paused', paused);
 });
 
@@ -430,7 +431,7 @@ const btnRestart = document.getElementById('btn-restart') as HTMLButtonElement;
 btnRestart.addEventListener('click', () => {
   sim.reset();
   paused = true;
-  btnPlay.textContent = 'Play';
+  btnPlay.innerHTML = ICON_PLAY;
   btnPlay.classList.add('btn-paused');
 });
 
@@ -440,7 +441,7 @@ btnReset.addEventListener('click', () => {
   updateSeedDisplay();
   syncSettingsUI();
   paused = true;
-  btnPlay.textContent = 'Play';
+  btnPlay.innerHTML = ICON_PLAY;
   btnPlay.classList.add('btn-paused');
 });
 

@@ -261,6 +261,15 @@ html, body {
   border-color: var(--text-muted);
 }
 
+#btn-play {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+}
+
 .btn-primary {
   background: var(--accent);
   color: var(--bg-deep);
@@ -336,10 +345,6 @@ html, body {
   gap: 6px;
 }
 
-.tool-btn[data-tool="erase"] {
-  margin-left: 8px;
-}
-
 .tool-btn {
   display: flex;
   align-items: center;
@@ -361,6 +366,7 @@ html, body {
   height: 16px;
   display: flex;
   align-items: center;
+  pointer-events: none;
   justify-content: center;
 }
 
@@ -373,11 +379,6 @@ html, body {
 
 .tool-btn.active .road-icon {
   background: var(--accent);
-}
-
-svg.erase-icon {
-  width: 16px;
-  height: 16px;
 }
 
 .tool-icon.prey-dot,
