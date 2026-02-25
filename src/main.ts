@@ -20,9 +20,20 @@ function saveConfig(config: SimConfig) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(config));
 }
 
+// --- Orientation-aware grid dimensions ---
+function orientedConfig(overrides: Partial<SimConfig> = {}): Partial<SimConfig> {
+  const isPortrait = window.innerHeight > window.innerWidth;
+  const base = { ...overrides };
+  if (isPortrait) {
+    base.width = overrides.height ?? DEFAULT_CONFIG.height;
+    base.height = overrides.width ?? DEFAULT_CONFIG.width;
+  }
+  return base;
+}
+
 // --- State ---
 let userConfig = loadConfig();
-let sim = new Simulation(userConfig);
+let sim = new Simulation(orientedConfig(userConfig));
 let paused = false;
 let speed = 1; // 1 = every 4th frame, 10 = every frame * multiple ticks
 let frameCount = 0;
@@ -301,7 +312,7 @@ btnCopySeed.addEventListener('click', () => {
 btnLoadSeed.addEventListener('click', () => {
   const seed = parseInt(seedInput.value);
   if (isNaN(seed)) return;
-  sim = new Simulation(sim.config, seed);
+  sim = new Simulation(orientedConfig(sim.config), seed);
   rendererInstance = new Renderer(worldCanvas, sim);
   updateSeedDisplay();
   syncSettingsUI();
@@ -400,7 +411,7 @@ settingsModal.querySelectorAll<HTMLDivElement>('.param-row').forEach((row) => {
 });
 
 btnResetDefaults.addEventListener('click', () => {
-  Object.assign(sim.config, DEFAULT_CONFIG);
+  Object.assign(sim.config, { ...DEFAULT_CONFIG, ...orientedConfig() });
   saveConfig(sim.config);
   syncSettingsUI();
 });
@@ -424,7 +435,7 @@ btnRestart.addEventListener('click', () => {
 });
 
 btnReset.addEventListener('click', () => {
-  sim = new Simulation(sim.config);
+  sim = new Simulation(orientedConfig(sim.config));
   rendererInstance = new Renderer(worldCanvas, sim);
   updateSeedDisplay();
   syncSettingsUI();
