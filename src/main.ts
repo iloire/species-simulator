@@ -39,6 +39,8 @@ let speed = 1; // 1 = every 4th frame, 10 = every frame * multiple ticks
 let frameCount = 0;
 let tool: 'road' | 'erase' | 'prey' | 'predator' = 'road';
 let isDrawing = false;
+let lastGridX = -1;
+let lastGridY = -1;
 
 // --- DOM ---
 const app = document.querySelector<HTMLDivElement>('#app')!;
@@ -470,6 +472,31 @@ function canvasToGrid(clientX: number, clientY: number): [number, number] {
   return [x, y];
 }
 
+function plotLine(x0: number, y0: number, x1: number, y1: number, cb: (x: number, y: number) => void) {
+  let dx = Math.abs(x1 - x0);
+  let dy = -Math.abs(y1 - y0);
+  const sx = x0 < x1 ? 1 : -1;
+  const sy = y0 < y1 ? 1 : -1;
+  let err = dx + dy;
+  for (;;) {
+    cb(x0, y0);
+    if (x0 === x1 && y0 === y1) break;
+    const e2 = 2 * err;
+    if (e2 >= dy) { err += dy; x0 += sx; }
+    if (e2 <= dx) { err += dx; y0 += sy; }
+  }
+}
+
+function applyToolLine(x: number, y: number) {
+  if (lastGridX >= 0 && (lastGridX !== x || lastGridY !== y)) {
+    plotLine(lastGridX, lastGridY, x, y, applyTool);
+  } else {
+    applyTool(x, y);
+  }
+  lastGridX = x;
+  lastGridY = y;
+}
+
 function applyTool(x: number, y: number) {
   const brushSize = tool === 'road' || tool === 'erase' ? 1 : 0;
 
@@ -497,14 +524,16 @@ function applyTool(x: number, y: number) {
 
 worldCanvas.addEventListener('mousedown', (e) => {
   isDrawing = true;
+  lastGridX = -1;
+  lastGridY = -1;
   const [x, y] = canvasToGrid(e.clientX, e.clientY);
-  applyTool(x, y);
+  applyToolLine(x, y);
 });
 
 worldCanvas.addEventListener('mousemove', (e) => {
   if (!isDrawing) return;
   const [x, y] = canvasToGrid(e.clientX, e.clientY);
-  applyTool(x, y);
+  applyToolLine(x, y);
 });
 
 window.addEventListener('mouseup', () => {
@@ -515,9 +544,11 @@ window.addEventListener('mouseup', () => {
 worldCanvas.addEventListener('touchstart', (e) => {
   e.preventDefault();
   isDrawing = true;
+  lastGridX = -1;
+  lastGridY = -1;
   const touch = e.touches[0];
   const [x, y] = canvasToGrid(touch.clientX, touch.clientY);
-  applyTool(x, y);
+  applyToolLine(x, y);
 }, { passive: false });
 
 worldCanvas.addEventListener('touchmove', (e) => {
@@ -525,7 +556,7 @@ worldCanvas.addEventListener('touchmove', (e) => {
   if (!isDrawing) return;
   const touch = e.touches[0];
   const [x, y] = canvasToGrid(touch.clientX, touch.clientY);
-  applyTool(x, y);
+  applyToolLine(x, y);
 }, { passive: false });
 
 window.addEventListener('touchend', () => {
