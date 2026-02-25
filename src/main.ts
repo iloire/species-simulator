@@ -255,7 +255,7 @@ app.innerHTML = `
           <button id="btn-reset" class="btn">Randomize</button>
           <div class="divider"></div>
           <label class="label">Speed</label>
-          <input type="range" id="speed" min="0.25" max="10" step="0.25" value="1" class="slider" />
+          <input type="range" id="speed" min="0" max="4" step="1" value="2" class="slider" />
           <span id="speed-val" class="slider-val">1x</span>
         </div>
 
@@ -444,9 +444,10 @@ btnReset.addEventListener('click', () => {
   btnPlay.classList.add('btn-paused');
 });
 
+const speedSteps = [0.25, 0.5, 1, 2, 5];
 speedSlider.addEventListener('input', () => {
-  speed = parseFloat(speedSlider.value);
-  speedVal.textContent = speed < 1 ? `${speed}x` : `${Math.round(speed)}x`;
+  speed = speedSteps[parseInt(speedSlider.value)];
+  speedVal.textContent = speed < 1 ? `${speed}x` : `${speed}x`;
 });
 
 // Tool selection
