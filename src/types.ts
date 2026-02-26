@@ -1,4 +1,4 @@
-export const CELL_SIZE = 6;
+export const CELL_SIZE = 8;
 
 export const CellType = {
   Empty: 0,
