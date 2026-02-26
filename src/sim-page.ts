@@ -62,7 +62,7 @@ function formatParamValue(key: string, value: number): string {
 export function mountSimPage(appEl: HTMLElement): () => void {
   let userConfig = loadConfig();
   let sim = new Simulation(orientedConfig(userConfig));
-  let paused = false;
+  let paused = true;
   let speed = 1;
   let frameCount = 0;
   let tool: 'road' | 'erase' | 'prey' | 'predator' = 'road';
@@ -321,7 +321,8 @@ export function mountSimPage(appEl: HTMLElement): () => void {
   const btnLoadSeed = document.getElementById('btn-load-seed') as HTMLButtonElement;
   const btnCopySeed = document.getElementById('btn-copy-seed') as HTMLButtonElement;
 
-  btnPlay.innerHTML = ICON_PAUSE;
+  btnPlay.innerHTML = ICON_PLAY;
+  btnPlay.classList.add('btn-paused');
 
   let rendererInstance = new Renderer(worldCanvas, sim);
 
