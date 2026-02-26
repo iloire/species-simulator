@@ -358,21 +358,30 @@ export function mountSimPage(appEl: HTMLElement): () => void {
   });
 
   // --- Help Modal ---
+  const HELP_SEEN_KEY = 'species-sim-help-seen';
   const helpModal = document.getElementById('help-modal')!;
   const btnHelp = document.getElementById('btn-help') as HTMLButtonElement;
   const btnCloseHelp = document.getElementById('btn-close-help') as HTMLButtonElement;
 
-  btnHelp.addEventListener('click', () => {
+  function openHelp() {
     helpModal.classList.remove('hidden');
-  });
+  }
 
-  btnCloseHelp.addEventListener('click', () => {
+  function closeHelp() {
     helpModal.classList.add('hidden');
-  });
+    localStorage.setItem(HELP_SEEN_KEY, '1');
+  }
+
+  btnHelp.addEventListener('click', openHelp);
+  btnCloseHelp.addEventListener('click', closeHelp);
 
   helpModal.addEventListener('click', (e) => {
-    if (e.target === helpModal) helpModal.classList.add('hidden');
+    if (e.target === helpModal) closeHelp();
   });
+
+  if (!localStorage.getItem(HELP_SEEN_KEY)) {
+    openHelp();
+  }
 
   // --- Settings Modal ---
   const settingsModal = document.getElementById('settings-modal')!;
