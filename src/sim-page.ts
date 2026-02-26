@@ -41,14 +41,13 @@ function saveConfig(config: SimConfig) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(config));
 }
 
-function orientedConfig(overrides: Partial<SimConfig> = {}): Partial<SimConfig> {
-  const isPortrait = window.innerHeight > window.innerWidth;
-  const base = { ...overrides };
-  if (isPortrait) {
-    base.width = overrides.height ?? DEFAULT_CONFIG.height;
-    base.height = overrides.width ?? DEFAULT_CONFIG.width;
-  }
-  return base;
+function computeGridSize(container: Element): { width: number; height: number } {
+  const style = getComputedStyle(container);
+  const padX = parseFloat(style.paddingLeft) + parseFloat(style.paddingRight);
+  const padY = parseFloat(style.paddingTop) + parseFloat(style.paddingBottom);
+  const w = Math.floor((container.clientWidth - padX) / CELL_SIZE);
+  const h = Math.floor((container.clientHeight - padY) / CELL_SIZE);
+  return { width: Math.max(20, w), height: Math.max(20, h) };
 }
 
 function formatParamValue(key: string, value: number): string {
@@ -61,7 +60,7 @@ function formatParamValue(key: string, value: number): string {
 
 export function mountSimPage(appEl: HTMLElement): () => void {
   let userConfig = loadConfig();
-  let sim = new Simulation(orientedConfig(userConfig));
+  let sim: Simulation = null!; // initialized after DOM renders
   let paused = true;
   let speed = 1;
   let frameCount = 0;
@@ -310,6 +309,7 @@ export function mountSimPage(appEl: HTMLElement): () => void {
   `;
 
   const worldCanvas = document.getElementById('world') as HTMLCanvasElement;
+  const canvasWrap = worldCanvas.parentElement!;
   const statsEl = document.getElementById('stats')!;
   const btnPlay = document.getElementById('btn-play') as HTMLButtonElement;
   const ICON_PAUSE = '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg>';
@@ -323,6 +323,10 @@ export function mountSimPage(appEl: HTMLElement): () => void {
 
   btnPlay.innerHTML = ICON_PLAY;
   btnPlay.classList.add('btn-paused');
+
+  // Compute grid dimensions from available container space
+  const gridSize = computeGridSize(canvasWrap);
+  sim = new Simulation({ ...userConfig, ...gridSize });
 
   let rendererInstance = new Renderer(worldCanvas, sim);
 
@@ -344,7 +348,7 @@ export function mountSimPage(appEl: HTMLElement): () => void {
   btnLoadSeed.addEventListener('click', () => {
     const seed = parseInt(seedInput.value);
     if (isNaN(seed)) return;
-    sim = new Simulation(orientedConfig(sim.config), seed);
+    sim = new Simulation({ ...sim.config, ...computeGridSize(canvasWrap) }, seed);
     rendererInstance = new Renderer(worldCanvas, sim);
     updateSeedDisplay();
     syncSettingsUI();
@@ -440,7 +444,7 @@ export function mountSimPage(appEl: HTMLElement): () => void {
   });
 
   btnResetDefaults.addEventListener('click', () => {
-    const defaults = { ...DEFAULT_CONFIG, ...orientedConfig() };
+    const defaults = { ...DEFAULT_CONFIG, ...computeGridSize(canvasWrap) };
     sim = new Simulation(defaults);
     rendererInstance = new Renderer(worldCanvas, sim);
     saveConfig(sim.config);
