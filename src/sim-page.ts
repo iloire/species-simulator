@@ -80,7 +80,7 @@ export function mountSimPage(appEl: HTMLElement): () => void {
         </nav>
         <div class="header-stats" id="stats"></div>
         <div class="seed-group">
-          <label class="label seed-label">Seed</label>
+          <label class="label seed-label" for="seed-input">Seed</label>
           <input type="text" id="seed-input" class="seed-input" />
           <button id="btn-load-seed" class="btn btn-sm" title="Load this seed">Go</button>
           <button id="btn-copy-seed" class="btn btn-sm btn-icon-sm" title="Copy seed">
@@ -285,7 +285,7 @@ export function mountSimPage(appEl: HTMLElement): () => void {
             <button id="btn-restart" class="btn" title="Restart with same map">Reset</button>
             <button id="btn-reset" class="btn">Randomize</button>
             <div class="divider"></div>
-            <label class="label">Speed</label>
+            <label class="label" for="speed">Speed</label>
             <input type="range" id="speed" min="0" max="4" step="1" value="2" class="slider" />
             <span id="speed-val" class="slider-val">1x</span>
           </div>
@@ -453,6 +453,17 @@ export function mountSimPage(appEl: HTMLElement): () => void {
   });
 
   syncSettingsUI();
+
+  // Associate param-row labels with their range inputs for accessibility
+  settingsModal.querySelectorAll<HTMLDivElement>('.param-row').forEach((row) => {
+    const input = row.querySelector('input') as HTMLInputElement;
+    const label = row.querySelector('label') as HTMLLabelElement;
+    if (input && label) {
+      const id = `param-${row.dataset.key}`;
+      input.id = id;
+      label.setAttribute('for', id);
+    }
+  });
 
   // --- Controls ---
   btnPlay.addEventListener('click', () => {

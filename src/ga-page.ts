@@ -32,7 +32,7 @@ function formatValue(key: string, value: number): string {
 const CATEGORY_COLORS: Record<string, string> = {
   prey: 'var(--prey)',
   predator: 'var(--predator)',
-  world: 'var(--text-muted)',
+  world: 'var(--text)',
 };
 
 function loadGASettings(): { pop: number; gens: number; ticks: number } {
@@ -123,16 +123,16 @@ export function mountGAPage(appEl: HTMLElement): () => void {
           </div>
 
           <div class="bottom-section">
-            <label class="label" title="Number of parameter sets tested per generation. Higher = better exploration but slower.">Pop</label>
-            <input type="range" id="ga-pop" min="10" max="60" step="5" value="${saved.pop}" class="slider" title="Population size" />
+            <label class="label" for="ga-pop" title="Number of parameter sets tested per generation. Higher = better exploration but slower.">Pop</label>
+            <input type="range" id="ga-pop" min="10" max="60" step="5" value="${saved.pop}" class="slider" />
             <span id="ga-pop-val" class="slider-val">${saved.pop}</span>
             <div class="divider"></div>
-            <label class="label" title="Number of evolutionary cycles. Each generation breeds a new population from the best of the previous.">Gens</label>
-            <input type="range" id="ga-gens" min="20" max="200" step="10" value="${saved.gens}" class="slider" title="Generations" />
+            <label class="label" for="ga-gens" title="Number of evolutionary cycles. Each generation breeds a new population from the best of the previous.">Gens</label>
+            <input type="range" id="ga-gens" min="20" max="200" step="10" value="${saved.gens}" class="slider" />
             <span id="ga-gens-val" class="slider-val">${saved.gens}</span>
             <div class="divider"></div>
-            <label class="label" title="How long each simulation runs to measure sustainability. More ticks = more accurate but slower.">Ticks</label>
-            <input type="range" id="ga-ticks" min="500" max="5000" step="250" value="${saved.ticks}" class="slider" title="Simulation ticks per evaluation" />
+            <label class="label" for="ga-ticks" title="How long each simulation runs to measure sustainability. More ticks = more accurate but slower.">Ticks</label>
+            <input type="range" id="ga-ticks" min="500" max="5000" step="250" value="${saved.ticks}" class="slider" />
             <span id="ga-ticks-val" class="slider-val">${saved.ticks}</span>
           </div>
         </div>
